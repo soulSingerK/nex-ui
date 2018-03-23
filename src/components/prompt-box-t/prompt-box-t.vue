@@ -3,6 +3,9 @@
   <div class="component-wrapper">
     <div class="test-dom" ref="test">
       <prompt-box :content="content" :is-show="true" :hide-time="10000" :parent-dom="parentDom"></prompt-box>
+      <!-- <svg class="icon" aria-hidden="true">
+        <use xlink:href="#icon-msnui-close"></use>
+      </svg> -->
     </div>
   </div>
 </template>
