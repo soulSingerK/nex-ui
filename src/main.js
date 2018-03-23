@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import 'common/sass/reset.scss'
+import 'common/sass/index.scss'
 
 Vue.config.productionTip = false
 
