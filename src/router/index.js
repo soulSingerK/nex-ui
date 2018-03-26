@@ -9,6 +9,12 @@ const PromptBox = (resolve) => {
   })
 }
 
+const Scroll = (resolve) => {
+  import('components/scroll-t/scroll-t').then((module) => {
+    resolve(module)
+  })
+}
+
 export default new Router({
   routes: [
     {
@@ -17,6 +23,10 @@ export default new Router({
     {
       path: '/promptBox',
       component: PromptBox
+    },
+    {
+      path: '/scroll',
+      component: Scroll
     }
   ]
 })
