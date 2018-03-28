@@ -21,12 +21,15 @@
 </template>
 
 <script>
-
 export default {
   props: {
     data: {
       type: Array,
       default: null
+    },
+    isBottom: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -43,9 +46,7 @@ export default {
   created() {
     this.start = {}
     this.$nextTick(() => {
-      this.barw = this.$refs.barw.clientHeight
-      this.scrollHeight = this.$refs.wrapper.scrollHeight
-      this.calcBarHeight()
+      this._initScroll()
     })
   },
   methods: {
@@ -54,7 +55,6 @@ export default {
       this.start.flag = true
       document.addEventListener('mousemove', this.onmousemove, false)
       document.addEventListener('mouseup', this.onmouseup, false)
-      console.log(this.start)
     },
     onmousemove (e) {
       if (!this.start.flag) {
@@ -63,7 +63,6 @@ export default {
       this.noSelect = true
       let offset = e.pageY - this.start.y
       this.barScrollTop = offset
-      console.log(this.barScrollTop)
     },
     onmouseup (e) {
       this.start.flag = false
@@ -84,10 +83,21 @@ export default {
       this.$refs.wrapper.scrollTop = `${(this.scrollHeight - this.clientHeight) * percent}`
     },
     calcBarHeight () {
-      this.clientHeight = this.$refs.wrapper.clientHeight
+      this.scrollHeight = this.$refs.wrapper.scrollHeight
       let h = this.clientHeight * this.barw / this.scrollHeight
       this.$refs.bar.style.height = `${h}px`
       this.bar = h
+    },
+    scrollToBottom () {
+      let _scrollTop = this.scrollHeight - this.clientHeight
+      this.scrollTop = _scrollTop
+      this.$refs.wrapper.scrollTop = _scrollTop
+    },
+    _initScroll () {
+      this.barw = this.$refs.barw.clientHeight
+      this.clientHeight = this.$refs.wrapper.clientHeight
+      this.calcBarHeight()
+      this.isBottom && this.scrollToBottom()
     }
   },
   watch: {
@@ -104,6 +114,7 @@ export default {
     data () {
       this.$nextTick(() => {
         this.calcBarHeight()
+        this.isBottom && this.scrollToBottom()
       })
     }
   }
