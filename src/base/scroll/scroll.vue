@@ -1,18 +1,18 @@
 <!--  -->
 <template>
-  <div class="scroll-wrapper" @scroll="contentScroll" ref="wrapper" :class="{'no-select':noSelect}">
+  <div class="scroll-wrapper" @scroll="contentScroll" ref="wrapper" :class="{'no-select':noSelect}" @mouseenter="barVisible=true" @mouseleave="barVisible=false">
     <slot></slot>
     <div class="scroll-bar">
       <span class="up direction">
-        <svg class="icon" aria-hidden="true">
+        <svg class="icon" aria-hidden="true" @click="_upLoad">
           <use xlink:href="#icon-zhcc_xiangshangjiantou"></use>
         </svg>
       </span>
       <div class="bar-wrapper" ref="barw">
-        <div class="bar" ref="bar" @mousedown="onmousedown"></div>
+        <div class="bar" ref="bar" @mousedown="onmousedown" v-show="barVisible" :class="{'hover-bg': barBg}"></div>
       </div>
       <span class="down direction">
-        <svg class="icon" aria-hidden="true">
+        <svg class="icon" aria-hidden="true" @click="_downLoad">
           <use xlink:href="#icon-xiangxiajiantoushixin"></use>
         </svg>
       </span>
@@ -40,7 +40,9 @@ export default {
       barw: -1,
       bar: -1,
       barScrollTop: 0,
-      noSelect: false
+      noSelect: false,
+      barVisible: false,
+      barBg: false
     }
   },
   created() {
@@ -49,10 +51,15 @@ export default {
       this._initScroll()
     })
   },
+  beforeDestroy() {
+    document.removeEventListener('mouseup', this.onmouseup, false)
+  },
   methods: {
     onmousedown(e) {
-      this.start.y = e.pageY - this.barScrollTop
+      this.start.y = e.pageY - (this.barScrollTop || 0)
+      this.start.x = e.pageX
       this.start.flag = true
+      this.barBg = true
       document.addEventListener('mousemove', this.onmousemove, false)
       document.addEventListener('mouseup', this.onmouseup, false)
     },
@@ -61,22 +68,29 @@ export default {
         return
       }
       this.noSelect = true
+      this.barVisible = true
       let offset = e.pageY - this.start.y
       this.barScrollTop = offset
     },
     onmouseup (e) {
       this.start.flag = false
       this.noSelect = false
+      this.barBg = false
+      this.barVisible = this._mouseIsInWrapper(e)
+      // if (e.path[1] !== this.$refs.wrapper && e.target !== this.$refs.bar && e.target !== this.$refs.barw) {
+      //   this.barVisible = false
+      // }
       document.removeEventListener('mousemove', this.onmousemove, false)
       document.removeEventListener('mousedown', this.onmousedown, false)
     },
     contentScroll (e) {
       this.scrollTop = e.target.scrollTop
-      // this.scrollHeight = e.target.scrollHeight
     },
     contentToBar () {
       let percent = this.scrollTop / (this.scrollHeight - this.clientHeight)
-      this.$refs.bar.style.top = `${(this.barw - this.bar) * percent}px`
+      let _top = (this.barw - this.bar) * percent
+      this.barScrollTop = _top
+      this.$refs.bar.style.top = `${_top}px`
     },
     barToContent () {
       let percent = this.barScrollTop / (this.barw - this.bar)
@@ -93,11 +107,34 @@ export default {
       this.scrollTop = _scrollTop
       this.$refs.wrapper.scrollTop = _scrollTop
     },
+    scrollToTop () {
+      this.scrollTop = 0
+      this.$refs.wrapper.scrollTop = 0
+    },
     _initScroll () {
       this.barw = this.$refs.barw.clientHeight
       this.clientHeight = this.$refs.wrapper.clientHeight
       this.calcBarHeight()
       this.isBottom && this.scrollToBottom()
+    },
+    _upLoad () {
+      this.scrollToTop()
+      this.$emit('uprefresh')
+    },
+    _downLoad () {
+      this.scrollToBottom()
+      this.$emit('downrefresh')
+    },
+    _mouseIsInWrapper (e) {
+      let wrapper = this.$refs.wrapper
+      let offsetLeft = wrapper.getBoundingClientRect().left
+      let offsetTop = wrapper.getBoundingClientRect().top
+      let rangeLeft = offsetLeft + wrapper.clientWidth
+      let rangeTop = offsetTop + wrapper.clientHeight
+      if (e.pageX > rangeLeft || e.pageX < offsetLeft || e.pageY > rangeTop || e.pageY < offsetTop) {
+        return false
+      }
+      return true
     }
   },
   watch: {
@@ -140,6 +177,7 @@ export default {
       .icon {
         font-size: 12px;
         color: #999;
+        cursor: pointer;
       }
       &.up {
         top: 2px;
@@ -163,6 +201,9 @@ export default {
         border-radius: 4px;
         cursor: pointer;
         &:hover {
+          background-color: #999;
+        }
+        &.hover-bg {
           background-color: #999;
         }
       }
