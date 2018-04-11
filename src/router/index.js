@@ -21,6 +21,11 @@ const EditElement = (resolve) => {
   })
 }
 
+const Carousel = resolve => {
+  import('components/carousel-t/carousel-t').then(module => {
+    resolve(module)
+  })
+}
 export default new Router({
   routes: [
     {
@@ -37,6 +42,10 @@ export default new Router({
     {
       path: '/editable',
       component: EditElement
+    },
+    {
+      path: '/carousel',
+      component: Carousel
     }
   ]
 })
