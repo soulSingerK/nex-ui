@@ -37,7 +37,7 @@ export default {
   },
   mounted () {
     this.$nextTick(() => {
-      // this.hide()
+      this.hide()
     })
   },
   methods: {

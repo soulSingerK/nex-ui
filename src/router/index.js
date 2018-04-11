@@ -15,6 +15,12 @@ const Scroll = (resolve) => {
   })
 }
 
+const EditElement = (resolve) => {
+  import('components/edit-element-t/edit-element-t').then((module) => {
+    resolve(module)
+  })
+}
+
 export default new Router({
   routes: [
     {
@@ -27,6 +33,10 @@ export default new Router({
     {
       path: '/scroll',
       component: Scroll
+    },
+    {
+      path: '/editable',
+      component: EditElement
     }
   ]
 })

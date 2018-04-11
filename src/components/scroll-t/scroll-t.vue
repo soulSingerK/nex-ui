@@ -1,6 +1,6 @@
 <template>
   <div class="component-wrapper">
-    <scroll :data="scrollData" :is-bottom="true">
+    <scroll :data="scrollData" :is-bottom="true" v-if="scrollData.length">
       <p v-for="(item, index) in scrollData" :key="index">
         {{item}}
       </p>
